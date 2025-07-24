@@ -248,6 +248,19 @@ spec:
         requireLastPushApproval: ${{ parameters.require_last_push_approval if not parameters.repo_settings else true }}
         requiredConversationResolution: ${{ parameters.require_conversation_resolution if not parameters.repo_settings else true }}
 
+    - id: pr
+      name: Enable GitHub Pages
+      action: publish:github:pull-request
+      input:
+        update: true
+        repoUrl: github.com?owner=${{ parameters.repository_owner }}&repo=${{ parameters.repository_name }}
+        title: "Enable GitHub Pages"
+        branchName: "gh-pages"
+        description: |
+          This PR is just to enable GitHub Pages for the repository.
+        targetPath: "."
+        commitMessage: "Enable GitHub Pages"
+
     - id: enablePages
       name: Enable GitHub Pages
       action: github:pages:enable
