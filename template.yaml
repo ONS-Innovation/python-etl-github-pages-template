@@ -250,7 +250,7 @@ spec:
 
     - id: enablePages
       name: Enable GitHub Pages
-      action: github:pages-enable
+      action: github:pages:enable
       input:
         repoUrl: ${{ steps.publish.output.remoteUrl }}
         buildType: workflow
