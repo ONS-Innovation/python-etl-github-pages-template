@@ -248,7 +248,14 @@ spec:
         requireLastPushApproval: ${{ parameters.require_last_push_approval if not parameters.repo_settings else true }}
         requiredConversationResolution: ${{ parameters.require_conversation_resolution if not parameters.repo_settings else true }}
 
-        # note: extra work to enable enable_secret_scanning, enable_vulnerability_alerts, or enable_automated_security_fixes
+    - id: enablePages
+      name: Enable GitHub Pages
+      action: github:pages-enable
+      input:
+        repoUrl: ${{ steps.publish.output.remoteUrl }}
+        buildType: workflow
+        sourceBranch: gh-pages
+        sourcePath: '/docs' 
 
     - id: register
       name: Register
