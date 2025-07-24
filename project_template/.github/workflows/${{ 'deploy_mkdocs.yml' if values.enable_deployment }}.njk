@@ -1,0 +1,80 @@
+# A GitHub Actions workflow to run ETL pipeline and deploy MkDocs documentation to GitHub Pages
+---
+name: ETL Pipeline & Deploy Documentation
+on:
+  push:
+    branches:
+      - master 
+      - main
+  {% if values.deploy_on_pr -%}
+  pull_request:
+    branches:
+      - master
+      - main
+  {% endif -%}
+permissions:
+  contents: write
+jobs:
+  etl-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Configure Git Credentials
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+          
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
+      
+      - uses: actions/cache@v4
+        with:
+          key: python-deps-${{ env.cache_id }}
+          path: ~/.cache/pip
+          restore-keys: |
+            python-deps-
+            
+      {% if values.package_manager == 'poetry' -%}
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          
+      - name: Install ETL Dependencies
+        run: poetry install --no-dev
+        
+      - name: Run ETL Pipeline
+        run: |
+          poetry run python run_etl.py \
+            --source example_data.csv \
+            --output results/processed.csv \
+            --deploy \
+            --project-name "${{ values.repository_name }}"
+      {% else -%}
+      - name: Install Pipenv
+        run: pip install pipenv
+        
+      - name: Install ETL Dependencies
+        run: pipenv install --deploy
+        
+      - name: Run ETL Pipeline
+        run: |
+          pipenv run python run_etl.py \
+            --source example_data.csv \
+            --output results/processed.csv \
+            --deploy \
+            --project-name "${{ values.repository_name }}"
+      {% endif -%}
+      
+      - name: Install MkDocs Dependencies
+        run: pip install -r mkdocs_requirements.txt
+        
+      - name: Deploy MkDocs
+        run: |
+          PYTHONPATH=. mkdocs gh-deploy --force 

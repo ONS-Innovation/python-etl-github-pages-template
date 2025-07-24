@@ -265,9 +265,8 @@ class MkDocsDeployer:
                 ],
             }
 
-            # Write mkdocs.yml
-            mkdocs_path = Path("mkdocs") / "mkdocs.yml"
-            mkdocs_path.parent.mkdir(exist_ok=True)
+            # Write mkdocs.yml to project root
+            mkdocs_path = Path("mkdocs.yml")
             
             with open(mkdocs_path, "w", encoding="utf-8") as f:
                 yaml.dump(mkdocs_config, f, default_flow_style=False, sort_keys=False)
@@ -429,7 +428,7 @@ def deploy_etl_results(
 def create_mkdocs_config(
     site_name: str = "${{values.docs_site_name}}",
     site_description: str = "${{values.docs_site_description}}",
-    config_path: str = "mkdocs/mkdocs.yml",
+    config_path: str = "mkdocs.yml",
 ) -> bool:
     """Create or update MkDocs configuration file.
 
