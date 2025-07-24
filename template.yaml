@@ -252,7 +252,7 @@ spec:
       name: Enable GitHub Pages
       action: github:pages:enable
       input:
-        repoUrl: ${{ steps.publish.output.remoteUrl }}
+        repoUrl: github.com?owner=${{ parameters.repository_owner }}&repo=${{ parameters.repository_name }}
         buildType: workflow
         sourceBranch: gh-pages
         sourcePath: '/docs' 
