@@ -1,10 +1,10 @@
-# {{ values.docs_site_name or values.repository_name }}
+# ${{ values.docs_site_name or values.repository_name }}
 
-{{ values.docs_site_description or values.repository_description }}
+${{ values.docs_site_description or values.repository_description }}
 
 ## Overview
 
-This documentation site contains the results and analysis from the ETL pipeline processing for the **{{ values.repository_name }}** project.
+This documentation site contains the results and analysis from the ETL pipeline processing for the **${{ values.repository_name }}** project.
 
 ## Features
 
@@ -30,8 +30,8 @@ This ETL pipeline includes:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/{{ values.repository_owner }}/{{ values.repository_name }}.git
-   cd {{ values.repository_name }}
+   git clone https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}.git
+   cd ${{ values.repository_name }}
    ```
 
 2. **Install dependencies**:
@@ -62,10 +62,10 @@ This ETL pipeline includes:
 
 ## Project Information
 
-- **Repository**: [{{ values.repository_name }}](https://github.com/{{ values.repository_owner }}/{{ values.repository_name }})
-- **Owner**: {{ values.repository_owner }}
-- **Package Manager**: [{{ values.package_manager | title }}]({{ values.package_manager_url }})
-- **Python Module**: `{{ values.module_name }}`
+- **Repository**: [${{ values.repository_name }}](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }})
+- **Owner**: ${{ values.repository_owner }}
+- **Package Manager**: [${{ values.package_manager | title }}](${{ values.package_manager_url }})
+- **Python Module**: `$${{ values.module_name }}`
 
 ## Documentation
 
