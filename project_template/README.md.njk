@@ -83,7 +83,7 @@ make run
 
 ## ETL Pipeline Usage
 
-This project includes a complete ETL (Extract, Transform, Load) pipeline for processing data{% if values.enable_s3_deployment %} with optional deployment to S3 as a static website{% endif %}.
+This project includes a complete ETL (Extract, Transform, Load) pipeline for processing data{% if values.enable_deployment %} with optional deployment to S3 as a static website{% endif %}.
 
 ### Basic Usage
 
@@ -114,7 +114,7 @@ python run_etl.py --source data.csv --output results/data.json --format json
 python run_etl.py --source data.csv --output results/data.csv --verbose
 ```
 
-{% if values.enable_s3_deployment %}
+{% if values.enable_deployment %}
 ### S3 Deployment
 
 Deploy your processed data as a beautiful, interactive web report:
@@ -166,7 +166,7 @@ The pipeline consists of four main components:
 1. **Extract** (`${{ values.module_name }}/extract.py`): Load data from various sources (CSV, Excel, JSON)
 2. **Transform** (`${{ values.module_name }}/transform.py`): Clean, validate, and enhance data
 3. **Load** (`${{ values.module_name }}/load.py`): Save processed data in multiple formats
-{% if values.enable_s3_deployment %}4. **Deploy** (`${{ values.module_name }}/deploy.py`): Generate HTML reports and deploy to S3{% endif %}
+{% if values.enable_deployment %}4. **Deploy** (`${{ values.module_name }}/deploy.py`): Generate HTML reports and deploy to S3{% endif %}
 
 ### Programmatic Usage
 
@@ -183,7 +183,7 @@ success = pipeline.run_pipeline(
     apply_transforms=True
 )
 
-{% if values.enable_s3_deployment %}
+{% if values.enable_deployment %}
 # Run with S3 deployment
 success = pipeline.run_pipeline(
     source_path="data.csv",

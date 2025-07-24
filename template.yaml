@@ -1,9 +1,9 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: python-etl-static-web-template
-  title: Python ETL Static Web Template
-  description: A basic ETL pipeline Python template to jump start a Python project with a static web frontend
+  name: python-etl-github-pages-template
+  title: Python ETL GitHub Pages Template
+  description: A basic ETL pipeline Python template to jump start a Python project with a GitHub Pages frontend
   tags:
     - python
     - etl
@@ -154,49 +154,36 @@ spec:
                     type: string
                     description: What is your Python module name? (e.g. app/src/<module_name>)
 
-    - title: S3 Deployment Settings
+    - title: MkDocs Deployment Settings
       properties:
-        enable_s3_deployment:
-          title: Enable S3 Static Website Deployment?
+        enable_deployment:
+          title: Enable MkDocs Documentation Deployment?
           type: boolean
-          default: false
-          description: Enable automatic deployment of ETL results to S3 as a static website
+          default: true
+          description: Enable automatic deployment of ETL results as MkDocs documentation to GitHub Pages
 
       dependencies:
-        enable_s3_deployment:
+        enable_deployment:
           allOf:
             - if:
                 properties:
-                  enable_s3_deployment:
+                  enable_deployment:
                     const: true
               then:
-                required:
-                  - s3_bucket_name
-                  - aws_region
                 properties:
-                  s3_bucket_name:
-                    title: S3 Bucket Name
-                    type: string
-                    description: Name of the S3 bucket for static website hosting
-                    pattern: ^[a-z0-9][a-z0-9\-]*[a-z0-9]$
-                  aws_region:
-                    title: AWS Region
-                    type: string
-                    description: AWS region for the S3 bucket
-                    default: eu-west-2
-                    enum:
-                      - eu-west-2
-                      - eu-west-1
                   deploy_on_pr:
                     title: Deploy on PR?
                     type: boolean
                     default: false
-                    description: Deploy the ETL results to S3 on PRs not just on push to main
-                  enable_github_secrets:
-                    title: Use GitHub Secrets for AWS Credentials?
-                    type: boolean
-                    default: true
-                    description: Store AWS credentials as GitHub Secrets (AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY)
+                    description: Deploy the ETL documentation on PRs not just on push to main
+                  docs_site_name:
+                    title: Documentation Site Name
+                    type: string
+                    description: Name for the MkDocs site (defaults to repository name)
+                  docs_site_description:
+                    title: Documentation Site Description
+                    type: string
+                    description: Description for the MkDocs site (defaults to repository description)
 
   steps:
     - id: template
@@ -222,11 +209,10 @@ spec:
           # computed values
           is_public_repo: ${{ parameters.repository_visibility == "public" }}
           package_manager_url: ${{ "https://python-poetry.org/" if parameters.package_manager == "poetry" else "https://pipenv.pypa.io/en/latest/" }}
-          enable_s3_deployment: ${{ parameters.enable_s3_deployment or false }}
-          s3_bucket_name: ${{ parameters.s3_bucket_name or "" }}
-          aws_region: ${{ parameters.aws_region or "us-east-1" }}
-          enable_github_secrets: ${{ parameters.enable_github_secrets or true }}
-          deploy_on_pr: ${{ parameters.deploy_on_pr or true }}
+          enable_deployment: ${{ parameters.enable_deployment or true }}
+          deploy_on_pr: ${{ parameters.deploy_on_pr or false }}
+          docs_site_name: ${{ parameters.docs_site_name or parameters.repository_name }}
+          docs_site_description: ${{ parameters.docs_site_description or parameters.repository_description }}
 
     - id: publish
       name: Publish
@@ -278,5 +264,5 @@ spec:
       - title: Open in Backstage
         icon: catalog
         entityRef: ${{ steps.register.output.entityRef }}
-      - title: Open Static Website
-        url: https://${{ parameters.s3_bucket_name }}.${{ parameters.aws_region }}.amazonaws.com/${{ parameters.repository_name }}/index.html
+      - title: Open Documentation Site
+        url: https://${{ parameters.repository_owner }}.github.io/${{ parameters.repository_name }}/

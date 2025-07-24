@@ -1,190 +1,84 @@
-# ${{ values.repository_name }}
+# {{ values.docs_site_name or values.repository_name }}
 
-Note: this is a copy of README.md
+{{ values.docs_site_description or values.repository_description }}
 
-[![Build Status](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions/workflows/ci.yml/badge.svg)](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions/workflows/ci.yml)
-[![Build Status](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions/workflows/security-scan.yml/badge.svg)](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions/workflows/security-scan.yml)
-{%- if values.is_public_repo %}
-[![Build Status](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions/workflows/codeql.yml/badge.svg)](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions/workflows/codeql.yml)
-{%- endif %}
-[![Linting: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![${{ values.package_manager }}-managed](https://img.shields.io/badge/${{ values.package_manager }}-managed-blue)](${{ values.package_manager_url }})
-[![License - MIT](https://img.shields.io/badge/licence%20-MIT-1ac403.svg)](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/blob/main/LICENSE)
+## Overview
 
-${{ values.repository_description }}
+This documentation site contains the results and analysis from the ETL pipeline processing for the **{{ values.repository_name }}** project.
 
-**IMPORTANT**: This README was generated from a template.
-Please update it with specific information about your project, including:
+## Features
 
-> -   Detailed project description and purpose
-> -   Specific installation requirements
-> -   Usage examples and API documentation
-> -   Contributing guidelines specific to your project
-> -   Any project-specific compliance requirements
+This ETL pipeline includes:
 
----
+- **Extract**: Data extraction from various sources
+- **Transform**: Data cleaning and processing
+- **Load**: Data output and validation
+{% if values.enable_deployment -%}
+- **Deploy**: Automatic documentation generation and deployment
+{% endif %}
 
-## Table of Contents
+## Available Reports
 
-[//]: # ":TODO: Enable link checking once https://github.com/tcort/markdown-link-check/issues/250 is resolved."
-
-<!-- markdown-link-check-disable -->
-
--   [Getting Started](#getting-started)
-    -   [Pre-requisites](#pre-requisites)
-    -   [Installation](#installation)
--   [Development](#development)
-    -   [Run Tests with Coverage](#run-tests-with-coverage)
-    -   [Linting and Formatting](#linting-and-formatting)
-    -   [Security Scanning](#security-scanning)
--   [Contributing](#contributing)
--   [License](#license)
-<!-- markdown-link-check-enable -->
+- [Data Report](data_report.md) - Detailed analysis of the processed data including:
+  - Data summary and statistics
+  - Column information and data types
+  - Missing value analysis
+  - Sample data preview
+  - Statistical summaries
 
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/{{ values.repository_owner }}/{{ values.repository_name }}.git
+   cd {{ values.repository_name }}
+   ```
 
-### Pre-requisites
+2. **Install dependencies**:
+   {% if values.package_manager == 'poetry' -%}
+   ```bash
+   poetry install
+   ```
+   {% else -%}
+   ```bash
+   pipenv install
+   ```
+   {% endif %}
 
-Ensure you have the following installed:
+3. **Run the ETL pipeline**:
+   {% if values.package_manager == 'poetry' -%}
+   ```bash
+   poetry run python run_etl.py
+   ```
+   {% else -%}
+   ```bash
+   pipenv run python run_etl.py
+   ```
+   {% endif %}
 
-1. **Python**: Version specified in `.python-version`.
-2. **[${{ values.package_manager | title }}](${{ values.package_manager_url }})**: This is used to manage package dependencies and virtual
-   environments.
-3. **Operation System**: MacOS
-
-### Installation
-
-1. Clone the repository and install the required dependencies.
-
-```bash
-git clone https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}.git
-```
-
-2. Install dependencies
-
-[${{ values.package_manager | title }}](${{ values.package_manager_url }}) is used to manage dependencies in this project. For more information, read
-the [${{ values.package_manager | title }} documentation](${{ values.package_manager_url }}).
-
-To install all dependencies, including development dependencies, run:
-
-```bash
-make install-dev
-```
-
-To install only production dependencies, run:
-
-```bash
-make install
-```
-
-3. Run the application
-
-```bash
-make run
-```
-
-## Development
-
-Get started with development by running the following commands.
-Before proceeding, make sure you have the development dependencies installed using the `make install-dev` command.
-
-A Makefile is provided to simplify common development tasks. To view all available commands, run:
-
-```bash
-make
-```
-
-### Run Tests with Coverage
-
-The unit tests are written using the [pytest](https://docs.pytest.org/en/stable/) framework. To run the tests and check
-coverage, run:
-
-```bash
-make test
-```
-
-### Linting and Formatting
-
-[Ruff](https://github.com/astral-sh/ruff) is used for both linting and formatting of the Python code in this project.
-Ruff is a fast Python linter and formatter that replaces multiple tools with a single, efficient solution.
-
-The tool is configured using the `pyproject.toml` file.
-
-To lint the Python code, run:
-
-```bash
-make lint
-```
-
-To auto-format the Python code and correct fixable linting issues, run:
-
-```bash
-make format
-```
-
-### Security Scanning
-
-[Bandit](https://bandit.readthedocs.io/en/latest/) is used for security scanning of the Python code.
-It helps identify common security issues in Python applications.
-
-To run the security scan, run:
-
-```bash
-make security-scan
-```
-
-### GitHub actions
-
-Linting/formatting and Security Scanning GitHub actions are enabled by default on template repositories. If you go to the `Actions` tab on your [repository](https://github.com/${{ values.repository_owner }}/${{ values.repository_name }}/actions), you can view all the workflows for the repository. If an action has failed, it will show a red circle with a cross in it.
-
-To find out more details about why it failed:
-
-1. Click on the name of the action
-2. Click the job in the Jobs section in the left sidebar
-3. Find the dropdown with the red circle with a cross in it to view more information about the failed action
-
-Please note that the GitHub actions will not automatically fix the errors, you must resolve them locally.
-
-#### Pre-commit Hooks
-
-The project includes pre-commit hooks to automatically run linting, formatting, and security checks before each commit.
-
-1. Install **pre-commit** using your selected package manager:
-
-{% if values.package_manager == 'poetry' %}
-
-```bash
-poetry add --group dev pre-commit
-```
-
-{% elif values.package_manager == 'pipenv' %}
-
-```bash
-pipenv install --dev pre-commit
-```
-
-{% else %}
-
-```bash
-pip install pre-commit
-```
-
+{% if values.enable_deployment -%}
+4. **View results**: The processed data and analysis will be automatically deployed to this documentation site.
 {% endif %}
 
-2. Activate the git hooks:
+## Project Information
+
+- **Repository**: [{{ values.repository_name }}](https://github.com/{{ values.repository_owner }}/{{ values.repository_name }})
+- **Owner**: {{ values.repository_owner }}
+- **Package Manager**: [{{ values.package_manager | title }}]({{ values.package_manager_url }})
+- **Python Module**: `{{ values.module_name }}`
+
+## Documentation
+
+{% if values.enable_deployment -%}
+This documentation is automatically generated and deployed using MkDocs and GitHub Pages whenever the ETL pipeline runs.
+{% else -%}
+To build and serve this documentation locally:
 
 ```bash
-pre-commit install
+mkdocs serve -f mkdocs/mkdocs.yml
 ```
+{% endif %}
 
-From now on Ruff and Bandit will run automatically on the files you stage before every commit.
+---
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
-## License
-
-See [LICENSE](LICENSE) for details.
+*This documentation is automatically generated from the ETL pipeline results.*

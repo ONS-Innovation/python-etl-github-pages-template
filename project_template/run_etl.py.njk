@@ -1,5 +1,5 @@
 
-"""ETL Pipeline runner script with command-line interface and optional S3 deployment."""
+"""ETL Pipeline runner script with command-line interface and optional MkDocs deployment."""
 
 import argparse
 import logging
@@ -20,19 +20,19 @@ logger = logging.getLogger(__name__)
 def create_parser() -> argparse.ArgumentParser:
     """Create command-line argument parser."""
     parser = argparse.ArgumentParser(
-        description="Run ETL Pipeline with optional S3 deployment",
+        description="Run ETL Pipeline with optional MkDocs documentation deployment",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Basic usage
   python run_etl.py --source data.csv --output results/processed.csv
 
-  # With transformations and deployment
+  # With transformations and documentation deployment
   python run_etl.py --source data.csv --output results/processed.csv --deploy
 
-  # Specify S3 bucket and project name
+  # Specify custom site name and description
   python run_etl.py --source data.csv --output results/processed.csv --deploy \\
-    --s3-bucket my-bucket --project-name "My Project"
+    --site-name "My Project Analysis" --site-description "ETL Results Documentation"
         """
     )
 
@@ -68,26 +68,26 @@ Examples:
     )
 
     # Deployment options
-{% if values.enable_s3_deployment %}
+{% if values.enable_deployment %}
     parser.add_argument(
         '--deploy',
         action='store_true',
-        help='Deploy results to S3 as static website'
+        help='Deploy results as MkDocs documentation to GitHub Pages'
     )
     parser.add_argument(
-        '--s3-bucket',
-        default=os.getenv('S3_BUCKET_NAME', '${{ values.s3_bucket_name }}'),
-        help='S3 bucket name for deployment (default: from environment or template)'
+        '--site-name',
+        default=os.getenv('DOCS_SITE_NAME', '${{ values.docs_site_name or values.repository_name }}'),
+        help='Documentation site name (default: from environment or template)'
     )
     parser.add_argument(
-        '--aws-region',
-        default=os.getenv('AWS_REGION', '${{ values.aws_region }}'),
-        help='AWS region (default: from environment or template)'
+        '--site-description',
+        default=os.getenv('DOCS_SITE_DESCRIPTION', '${{ values.docs_site_description or values.repository_description }}'),
+        help='Documentation site description (default: from environment or template)'
     )
     parser.add_argument(
         '--project-name',
         default='${{ values.repository_name }}',
-        help='Project name for website title and S3 prefix'
+        help='Project name for documentation title'
     )
 {% endif %}
 
@@ -128,21 +128,17 @@ def prepare_pipeline_args(args):
         'apply_transforms': not args.no_transforms,
     }
 
-{% if values.enable_s3_deployment %}
+{% if values.enable_deployment %}
     # Add deployment arguments if enabled
     if args.deploy:
-        if not args.s3_bucket:
-            logger.error("S3 bucket name required for deployment. Use --s3-bucket or set S3_BUCKET_NAME environment variable")
-            sys.exit(1)
-
         pipeline_args.update({
             'enable_deployment': True,
-            's3_bucket_name': args.s3_bucket,
-            'project_name': args.project_name,
-            'aws_region': args.aws_region
+            'site_name': args.site_name,
+            'site_description': args.site_description,
+            'project_name': args.project_name
         })
 
-        logger.info(f"Deployment enabled - S3 bucket: {args.s3_bucket}, Region: {args.aws_region}")
+        logger.info(f"Documentation deployment enabled - Site: {args.site_name}")
 {% endif %}
 
     return pipeline_args
@@ -169,11 +165,11 @@ def display_pipeline_summary(pipeline):
     if 'load' in summary:
         logger.info(f"  Output file: {summary['load']['output_path']}")
 
-{% if values.enable_s3_deployment %}
+{% if values.enable_deployment %}
     if 'deploy' in summary and summary['deploy']['status'] == 'success':
-        website_url = summary['deploy']['website_url']
-        logger.info(f"  Website URL: {website_url}")
-        print(f"\nYour data report is live at: {website_url}")
+        docs_url = summary['deploy']['docs_url']
+        logger.info(f"  Documentation URL: {docs_url}")
+        print(f"\nYour data documentation is available at: {docs_url}")
 {% endif %}
 
 

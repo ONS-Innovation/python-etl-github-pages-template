@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-DEPENDENCIES=("pandas" "boto3" "jinja2")
+DEPENDENCIES=("pandas" "pyyaml" "jinja2")
 DEV_DEPENDENCIES=("bandit" "pytest" "pytest-xdist" "ruff" "pytest-cov")
 TEMPLATE_DIR="../../project_template"
 
