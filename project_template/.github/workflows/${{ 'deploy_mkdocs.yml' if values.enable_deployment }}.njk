@@ -4,13 +4,11 @@ name: ETL Pipeline & Deploy Documentation
 on:
   push:
     branches:
-      - master 
-      - main
+      - ${{ values.default_branch }}
 {% if values.deploy_on_pr == true -%}
-  pull_request:
-    branches:
-      - master
-      - main
+    pull_request:
+      branches:
+        - ${{ values.default_branch }}
 {% endif -%}
 
 permissions:
