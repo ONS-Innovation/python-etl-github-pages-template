@@ -6,7 +6,7 @@ on:
     branches:
       - master 
       - main
-  {% if values.deploy_on_pr -%}
+  {% if values.deploy_on_pr == true -%}
   pull_request:
     branches:
       - master
