@@ -6,15 +6,16 @@ on:
     branches:
       - master 
       - main
-  {% if values.deploy_on_pr == true -%}
+{% if values.deploy_on_pr == true -%}
   pull_request:
     branches:
       - master
       - main
-  {% endif -%}
+{% endif -%}
 
 permissions:
   contents: write
+
 jobs:
   etl-and-deploy:
     runs-on: ubuntu-latest
