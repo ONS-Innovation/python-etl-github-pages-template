@@ -267,7 +267,7 @@ spec:
       input:
         repoUrl: github.com?owner=${{ parameters.repository_owner }}&repo=${{ parameters.repository_name }}
         buildType: workflow
-        sourceBranch: gh-pages
+        sourceBranch: ${{ parameters.default_branch }}
         sourcePath: '/docs' 
 
     - id: register
