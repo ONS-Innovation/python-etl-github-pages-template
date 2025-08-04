@@ -45,7 +45,7 @@ jobs:
           virtualenvs-in-project: true
           
       - name: Install ETL Dependencies
-        run: poetry install --no-dev
+        run: poetry install --only main
         
       - name: Run ETL Pipeline
         run: |
