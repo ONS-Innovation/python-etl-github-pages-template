@@ -112,9 +112,9 @@ def validate_arguments(args):
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
 
-def configure_logging(args):
+def configure_logging(verbose: bool):
     """Configure logging based on command-line arguments."""
-    if args.verbose:
+    if verbose:
         logging.getLogger().setLevel(logging.DEBUG)
 
 
@@ -173,7 +173,7 @@ def display_pipeline_summary(pipeline):
 {% endif %}
 
 
-def run_pipeline(pipeline_args):
+def run_pipeline(pipeline_args, verbose=False):
     """Execute the ETL pipeline with error handling."""
     pipeline = ETLPipeline()
 
@@ -182,7 +182,7 @@ def run_pipeline(pipeline_args):
         return success, pipeline
     except Exception as e:
         logger.error(f"ETL pipeline failed with error: {e}")
-        if args.verbose:
+        if verbose:
             import traceback
             traceback.print_exc()
         sys.exit(1)
@@ -194,7 +194,7 @@ def start_etl():
     args = parser.parse_args()
 
     # Configure logging level
-    configure_logging(args)
+    configure_logging(args.verbose)
 
     # Validate arguments
     validate_arguments(args)
@@ -206,7 +206,7 @@ def start_etl():
     log_pipeline_start(args)
 
     # Run the pipeline
-    success, pipeline = run_pipeline(pipeline_args)
+    success, pipeline = run_pipeline(pipeline_args, args.verbose)
 
     if success:
         logger.info("ETL pipeline completed successfully!")
