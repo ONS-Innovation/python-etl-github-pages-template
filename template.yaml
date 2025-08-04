@@ -261,14 +261,14 @@ spec:
         targetPath: "."
         commitMessage: "Enable GitHub Pages"
 
-    - id: enablePages
-      name: Enable GitHub Pages
-      action: github:pages:enable
-      input:
-        repoUrl: github.com?owner=${{ parameters.repository_owner }}&repo=${{ parameters.repository_name }}
-        buildType: workflow
-        sourceBranch: ${{ parameters.default_branch }}
-        sourcePath: '/docs' 
+    # - id: enablePages
+    #   name: Enable GitHub Pages
+    #   action: github:pages:enable
+    #   input:
+    #     repoUrl: github.com?owner=${{ parameters.repository_owner }}&repo=${{ parameters.repository_name }}
+    #     buildType: workflow
+    #     sourceBranch: ${{ parameters.default_branch }}
+    #     sourcePath: '/docs' 
 
     - id: register
       name: Register
