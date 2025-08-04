@@ -1,11 +1,10 @@
 import logging
-import os
-import yaml
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
 import pandas as pd
+import yaml
 from jinja2 import Environment, FileSystemLoader
 
 logger = logging.getLogger(__name__)
@@ -23,7 +22,7 @@ class MarkdownGenerator:
         self.template_dir = Path(template_dir)
         self.env = Environment(
             loader=FileSystemLoader(template_dir),
-            autoescape=False,  # Disable autoescaping for markdown
+            autoescape=True,
         )
 
     def generate_data_report(
@@ -100,20 +99,20 @@ class MarkdownGenerator:
 
         # Convert DataFrame to markdown table
         markdown_lines = []
-        
+
         # Header row
         headers = [""] + [str(col) for col in df.columns]
         markdown_lines.append("| " + " | ".join(headers) + " |")
-        
+
         # Separator row
         separators = [":---"] * len(headers)
         markdown_lines.append("| " + " | ".join(separators) + " |")
-        
+
         # Data rows
         for idx, row in df.iterrows():
             row_data = [str(idx)] + [str(val) for val in row]
             markdown_lines.append("| " + " | ".join(row_data) + " |")
-        
+
         return "\n".join(markdown_lines)
 
     def create_default_template(self, template_path: str) -> bool:
@@ -168,7 +167,8 @@ The following table shows the first 10 rows of the processed data:
 | Column | Data Type | Missing Values | Missing % |
 |:---|:---|---:|---:|
 {% for column in columns -%}
-| {{ column }} | {{ data_types[column] }} | {{ missing_values[column] }} | {{ (missing_values[column] / total_rows * 100) | round(1) }}% |
+| {{ column }} | {{ data_types[column] }} |
+{{ missing_values[column] }} | {{ (missing_values[column] / total_rows * 100) | round(1) }}% |
 {% endfor %}
 
 ---
@@ -230,8 +230,8 @@ class MkDocsDeployer:
             mkdocs_config = {
                 "site_name": self.site_name,
                 "site_description": self.site_description,
-                "site_url": f"https://${{values.repository_owner}}.github.io/${{values.repository_name}}/",
-                "repo_url": f"https://github.com/${{values.repository_owner}}/${{values.repository_name}}",
+                "site_url": "https://${values.repository_owner}.github.io/${values.repository_name}/",
+                "repo_url": "https://github.com/${values.repository_owner}/${values.repository_name}",
                 "repo_name": "${{values.repository_name}}",
                 "docs_dir": "docs",
                 "site_dir": "site",
@@ -267,7 +267,7 @@ class MkDocsDeployer:
 
             # Write mkdocs.yml to project root
             mkdocs_path = Path("mkdocs.yml")
-            
+
             with open(mkdocs_path, "w", encoding="utf-8") as f:
                 yaml.dump(mkdocs_config, f, default_flow_style=False, sort_keys=False)
 
@@ -390,7 +390,7 @@ def deploy_etl_results(
             return None
 
         # Read the generated content
-        with open(temp_report_path, "r", encoding="utf-8") as f:
+        with open(temp_report_path, encoding="utf-8") as f:
             report_content = f.read()
 
         # Initialise MkDocs deployer
@@ -406,15 +406,16 @@ def deploy_etl_results(
         markdown_files = {
             "data_report.md": report_content,
         }
-        
+
         success = mkdocs_deployer.deploy_documentation(markdown_files)
 
         # Cleanup temporary directory
         import shutil
+
         shutil.rmtree(temp_dir)
 
         if success:
-            docs_url = f"https://${{values.repository_owner}}.github.io/${{values.repository_name}}/"
+            docs_url = "https://${values.repository_owner}.github.io/${values.repository_name}/"
             logger.info(f"Documentation will be available at: {docs_url}")
             return docs_url
         else:
@@ -444,8 +445,8 @@ def create_mkdocs_config(
         config = {
             "site_name": site_name,
             "site_description": site_description,
-            "site_url": f"https://${{values.repository_owner}}.github.io/${{values.repository_name}}/",
-            "repo_url": f"https://github.com/${{values.repository_owner}}/${{values.repository_name}}",
+            "site_url": "https://${values.repository_owner}.github.io/${values.repository_name}/",
+            "repo_url": "https://github.com/${values.repository_owner}/${values.repository_name}",
             "repo_name": "${{values.repository_name}}",
             "docs_dir": "docs",
             "site_dir": "site",
